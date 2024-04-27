@@ -5,7 +5,9 @@ require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+    origin : ['http://localhost:5173']
+}));
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.Tourism_User}:${process.env.Tourism_User_Pass}@cluster0.kd61vsr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -22,7 +24,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     
     
     const userData = client.db("AllCurdUser").collection("tourisData")
@@ -33,6 +35,8 @@ async function run() {
     const indonesiaData = client.db("AllCurdUser").collection("indoData")
     const malaysiaData = client.db("AllCurdUser").collection("malData")
     const vietnamData = client.db("AllCurdUser").collection("VietnamData")
+    const colombiaData = client.db("AllCurdUser").collection("ColombiaData")
+    const allSpotData = client.db("AllCurdUser").collection("AllSpotData")
 
     app.get('/data',async(req,res) =>{
         const cursor = viewAllData.find();
@@ -64,11 +68,23 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
+    app.get('/colombiaData',async(req,res) =>{
+        const cursor = colombiaData.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    })
     app.get('/addspot',async(req,res) =>{
         const cursor = AddSpot.find();
         const result = await cursor.toArray();
         res.send(result);
     })
+    
+    app.get('/allSpotData',async(req,res) =>{
+        const cursor = allSpotData.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+    
 
 
     app.post("/users", async (req,res) => {
@@ -101,9 +117,19 @@ async function run() {
         const result = await vietnamData.insertOne(user);
         res.send(result);
     })
+    app.post("/colombiaData", async (req,res) => {
+        const user = req.body;
+        const result = await colombiaData.insertOne(user);
+        res.send(result);
+    })
     app.post("/addspot", async (req,res) => {
         const user = req.body;
         const result = await AddSpot.insertOne(user);
+        res.send(result);
+    })
+    app.post("/allSpotData", async (req,res) => {
+        const user = req.body;
+        const result = await allSpotData.insertOne(user);
         res.send(result);
     })
 
