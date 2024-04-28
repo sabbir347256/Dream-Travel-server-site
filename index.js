@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config()
@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors({
-    origin : ['http://localhost:5173']
+    origin : ['http://localhost:5173','https://tourism-managment-1daa3.web.app']
 }));
 app.use(express.json());
 
@@ -78,12 +78,32 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
+
+    app.get('/addspot/:id', async(req,res) =>{
+        const id = req.params.id;
+        const query = {_id : new ObjectId(id)};
+        const result = await AddSpot.findOne(query);
+        res.send(result);
+    })
+
+
+    app.get('/mylisSpot/:email', async(req,res) =>{
+        const email = req.params.email;
+        // console.log('delte',id);
+        const query = {email :  (email)};
+        const cursor = AddSpot.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+
+
     
     app.get('/allSpotData',async(req,res) =>{
         const cursor = allSpotData.find();
         const result = await cursor.toArray();
         res.send(result);
     })
+
     
 
 
@@ -132,6 +152,40 @@ async function run() {
         const result = await allSpotData.insertOne(user);
         res.send(result);
     })
+
+
+    app.put('/addspot/:id', async (req,res) => {
+        const id = req.params.id;
+        const user = req.body;
+        console.log(id,user);
+        const filter = {_id : new ObjectId(id)};
+        const options = {upsert : true};
+        const updatedSpot = {
+            $set : {
+                photo: user.photo,
+                spotName : user.spotName,
+                countryName : user.countryName,
+                location : user.location,
+                description : user.description,
+                cost : user.cost,
+                seasonality : user.seasonality,
+                travelTime : user.travelTime,
+                totaVisitorsPerYear : user.totaVisitorsPerYear
+            }
+        };
+        const result = await AddSpot.updateOne(filter,updatedSpot,options);
+        res.send(result);
+    })
+
+    app.delete('/mylisSpot/:id', async(req,res) => {
+        const id = req.params.id;
+        console.log('delte',id);
+        const query = {_id : new ObjectId(id)};
+        const result = await AddSpot.deleteOne(query);
+        res.send(result);
+    })
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
