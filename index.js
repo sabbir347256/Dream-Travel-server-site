@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors({
-    origin : ['https://heartfelt-youtiao-0e89a3.netlify.app','http://localhost:5173','tourism-managment-1daa3.web.app']
+    origin : ['https://heartfelt-youtiao-0e89a3.netlify.app','http://localhost:5173','https://dreamtraveltourismagency.netlify.app']
 }));
 app.use(express.json());
 
